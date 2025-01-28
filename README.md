@@ -1,4 +1,4 @@
-# WCAG Accessibility Checker
+# WCAG Accessibility Checker: https://adarshpawar29.github.io/wcag-tool/
 
 This tool checks HTML code for accessibility issues based on WCAG guidelines.
 
