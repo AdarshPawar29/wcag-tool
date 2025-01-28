@@ -130,7 +130,7 @@
         }
 
         .success-stat {
-            background: var (--success);
+            background: var(--success);
         }
 
         .issue {
@@ -404,6 +404,50 @@ Good: <header role="banner">...</header>`,
                 fix: `Bad: <div aria-label=""></div>
 Good: <div aria-label="Description"></div>`,
                 resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'audio',
+                selector: 'audio',
+                test: (el) => !el.hasAttribute('controls'),
+                guideline: '1.2.1 Audio-only and Video-only (Prerecorded)',
+                severity: 'error',
+                suggestion: 'Audio elements must have controls',
+                fix: `Bad: <audio src="audio.mp3"></audio>
+Good: <audio src="audio.mp3" controls></audio>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/audio-only-and-video-only-prerecorded.html']
+            },
+            {
+                category: 'video',
+                selector: 'video',
+                test: (el) => !el.hasAttribute('controls'),
+                guideline: '1.2.2 Captions (Prerecorded)',
+                severity: 'error',
+                suggestion: 'Video elements must have controls',
+                fix: `Bad: <video src="video.mp4"></video>
+Good: <video src="video.mp4" controls></video>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/captions-prerecorded.html']
+            },
+            {
+                category: 'table',
+                selector: 'table',
+                test: (el) => !el.querySelector('th'),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'error',
+                suggestion: 'Tables must have header cells (<th>)',
+                fix: `Bad: <table><tr><td>Data</td></tr></table>
+Good: <table><tr><th>Header</th></tr><tr><td>Data</td></tr></table>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html']
+            },
+            {
+                category: 'lang',
+                selector: 'html',
+                test: (el) => !el.hasAttribute('lang'),
+                guideline: '3.1.1 Language of Page',
+                severity: 'error',
+                suggestion: 'The <html> element must have a lang attribute',
+                fix: `Bad: <html>
+Good: <html lang="en">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/language-of-page.html']
             }
         ];
 
@@ -432,6 +476,10 @@ Good: <div aria-label="Description"></div>`,
 
         function checkAccessibility() {
             const code = document.getElementById('codeInput').value;
+            if (!isValidHTML(code)) {
+                alert('Please paste valid HTML, JSX, or HTML-like code.');
+                return;
+            }
             const doc = new DOMParser().parseFromString(code, 'text/html');
             const resultsContainer = document.getElementById('resultsContainer');
             resultsContainer.innerHTML = '';
@@ -449,7 +497,7 @@ Good: <div aria-label="Description"></div>`,
                             <div><strong>Severity:</strong> ${rule.severity}</div>
                             <div><strong>Found in:</strong> <code>${codeSnippet}</code></div>
                             <div class="toggle-details" onclick="toggleDetails(this)">▼ Show fix</div>
-                            <div class="details">
+                            <div class="details" style="display: none;">
                                 <strong>How to fix:</strong>
                                 <pre>${rule.fix || 'No specific fix provided'}</pre>
                                 ${rule.resources ? `<strong>Resources:</strong>
@@ -479,6 +527,11 @@ Good: <div aria-label="Description"></div>`,
             const details = button.nextElementSibling;
             details.style.display = details.style.display === 'none' ? 'block' : 'none';
             button.textContent = details.style.display === 'none' ? '▼ Show fix' : '▲ Hide fix';
+        }
+
+        function isValidHTML(str) {
+            const doc = new DOMParser().parseFromString(str, 'text/html');
+            return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
         }
     </script>
 </body>
