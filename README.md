@@ -1,6 +1,7 @@
 # WCAG Accessibility Checker
 
 This tool checks HTML code for accessibility issues based on WCAG guidelines.
+
 GitHub Page: https://adarshpawar29.github.io/wcag-tool/
 
 ## Adding New Rules
