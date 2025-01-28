@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        :root {
+            --error: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+            --text: #212529;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --padding: 1rem;
+            --transition: 0.3s ease;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        h1,
+        h2 {
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--info);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .code-input,
+        .results {
+            flex: 1 1 45%;
+            background: var(--card-bg);
+            padding: var(--padding);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .code-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            margin: 1rem 0;
+            padding: var(--padding);
+            border: 2px solid #dee2e6;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            resize: none;
+            transition: border-color var(--transition);
+        }
+
+        textarea:focus {
+            border-color: var(--info);
+            outline: none;
+        }
+
+        button {
+            align-self: flex-end;
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background var(--transition), transform var(--transition);
+        }
+
+        button:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .results h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .error-stat {
+            background: var(--error);
+        }
+
+        .warning-stat {
+            background: var(--warning);
+            color: #212529;
+        }
+
+        .success-stat {
+            background: var (--success);
+        }
+
+        .issue {
+            margin-top: 1rem;
+            padding: var(--padding);
+            border-left: 5px solid;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px var(--shadow);
+            background: var(--card-bg);
+            transition: transform var(--transition);
+        }
+
+        .issue:hover {
+            transform: translateY(-5px);
+        }
+
+        .issue.error {
+            border-color: var(--error);
+        }
+
+        .issue.warning {
+            border-color: var(--warning);
+        }
+
+        .issue.success {
+            border-color: var(--success);
+        }
+
+        .category {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .forms {
+            background: #e83e8c;
+        }
+
+        .images {
+            background: #20c997;
+        }
+
+        .semantics {
+            background: #6610f2;
+        }
+
+        .navigation {
+            background: #fd7e14;
+        }
+
+        .contrast {
+            background: #ffd700;
+            color: #212529;
+        }
+
+        .headings {
+            background: #17a2b8;
+        }
+
+        .toggle-details {
+            color: var(--info);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            transition: color var(--transition);
+        }
+
+        .toggle-details:hover {
+            color: #0d6efd;
+        }
+
+        pre {
+            margin-top: 1rem;
+            padding: var(--padding);
+            background: #f1f3f5;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .no-issues {
+            text-align: center;
+            padding: var(--padding);
+            background: var(--success);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .no-issues ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .no-issues li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HTML content -->
+    <h1>Accessibility Checker</h1>
+    <textarea id="codeInput" rows="10" cols="80" placeholder="Paste your HTML code here..."></textarea>
+    <button onclick="checkAccessibility()">Run Accessibility Check</button>
+
+    <div id="resultsContainer"></div>
+
+    <script>
+        const accessibilityRules = [
+            {
+                category: 'forms',
+                selector: 'input[type="text"], input[type="email"], input[type="password"]',
+                test: (el) => !el.id || !document.querySelector(`label[for="${el.id}"]`),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'error',
+                suggestion: 'Form inputs must have associated labels',
+                fix: `Bad: <input type="text">
+Good: <label for="name">Name</label><input type="text" id="name">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html']
+            },
+            {
+                category: 'headings',
+                selector: 'body',
+                test: (el) => {
+                    const headings = el.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                    const levels = Array.from(headings).map(h => parseInt(h.tagName[1]));
+                    for (let i = 1; i < levels.length; i++) {
+                        if (levels[i] > levels[i - 1] + 1) {
+                            return true; // Skipped heading levels found
+                        }
+                    }
+                    return !levels.includes(1);
+                },
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'warning',
+                suggestion: 'Heading structure should be logical and contain h1',
+                fix: `Maintain proper heading hierarchy:
+<h1>Main title</h1>
+  <h2>Section</h2>
+    <h3>Subsection</h3>`
+            },
+            {
+                category: 'semantics',
+                selector: '[role]',
+                test: (el) => {
+                    const role = el.getAttribute('role');
+                    const hasName = el.hasAttribute('aria-label') ||
+                        el.hasAttribute('aria-labelledby') ||
+                        (el.textContent.trim() && !el.hasAttribute('aria-hidden'));
+                    return !hasName;
+                },
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'Elements with ARIA roles must have accessible names',
+                fix: `Add aria-label or aria-labelledby:
+<button role="switch" aria-label="Dark mode"></button>`
+            },
+            {
+                category: 'contrast',
+                selector: '*',
+                test: (el) => {
+                    const style = window.getComputedStyle(el);
+                    const bgColor = style.backgroundColor;
+                    const textColor = style.color;
+                    // Simple contrast check (for demonstration)
+                    return el.textContent.trim() &&
+                        getContrastRatio(bgColor, textColor) < 4.5;
+                },
+                guideline: '1.4.3 Contrast (Minimum)',
+                severity: 'warning',
+                suggestion: 'Ensure text has sufficient contrast ratio (4.5:1)',
+                fix: `Use contrast checking tools like:
+- WebAIM Contrast Checker
+- Chrome DevTools Contrast Audit`
+            },
+            {
+                category: 'navigation',
+                selector: 'a[href^="#"]',
+                test: (el) => !el.hash || !document.querySelector(el.hash),
+                guideline: '2.4.1 Bypass Blocks',
+                severity: 'error',
+                suggestion: 'Anchor links must point to existing elements',
+                fix: `Ensure target element exists:
+<a href="#section">Go to</a>
+<section id="section">...</section>`
+            },
+            {
+                category: 'images',
+                selector: 'img',
+                test: (el) => !el.alt || el.alt.trim() === '',
+                guideline: '1.1.1 Non-text Content',
+                severity: 'error',
+                suggestion: 'Images must have alt attributes',
+                fix: `Bad: <img src="image.jpg">
+Good: <img src="image.jpg" alt="Description of the image">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html']
+            },
+            {
+                category: 'links',
+                selector: 'a',
+                test: (el) => !el.textContent.trim() && !el.getAttribute('aria-label'),
+                guideline: '2.4.4 Link Purpose (In Context)',
+                severity: 'error',
+                suggestion: 'Links must have discernible text or aria-label',
+                fix: `Bad: <a href="page.html"></a>
+Good: <a href="page.html">Link text</a>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-in-context.html']
+            },
+            {
+                category: 'iframes',
+                selector: 'iframe',
+                test: (el) => !el.title || el.title.trim() === '',
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'Iframes must have a title attribute',
+                fix: `Bad: <iframe src="content.html"></iframe>
+Good: <iframe src="content.html" title="Description of the iframe content"></iframe>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'buttons',
+                selector: 'button',
+                test: (el) => !el.textContent.trim() && !el.getAttribute('aria-label'),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'Buttons must have discernible text or aria-label',
+                fix: `Bad: <button></button>
+Good: <button>Button text</button>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'tabindex',
+                selector: '[tabindex]',
+                test: (el) => {
+                    const tabindex = parseInt(el.getAttribute('tabindex'), 10);
+                    return isNaN(tabindex) || tabindex < 0;
+                },
+                guideline: '2.4.3 Focus Order',
+                severity: 'warning',
+                suggestion: 'Elements with tabindex should have a positive value',
+                fix: `Bad: <div tabindex="-1">...</div>
+Good: <div tabindex="0">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html']
+            },
+            {
+                category: 'landmarks',
+                selector: 'header, nav, main, footer, aside',
+                test: (el) => !el.hasAttribute('role'),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'warning',
+                suggestion: 'Landmark elements should have appropriate roles',
+                fix: `Bad: <header>...</header>
+Good: <header role="banner">...</header>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html']
+            },
+            {
+                category: 'aria',
+                selector: '[aria-*]',
+                test: (el) => {
+                    const ariaAttributes = Array.from(el.attributes).filter(attr => attr.name.startsWith('aria-'));
+                    return ariaAttributes.some(attr => attr.value.trim() === '');
+                },
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'ARIA attributes must have valid values',
+                fix: `Bad: <div aria-label=""></div>
+Good: <div aria-label="Description"></div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            }
+        ];
+
+        // Add contrast ratio helper
+        function getContrastRatio(color1, color2) {
+            function luminance(rgb) {
+                const [r, g, b] = rgb.map(x => {
+                    const a = x / 255;
+                    return a <= 0.03928 ? a / 12.92 : Math.pow((a + 0.055) / 1.055, 2.4);
+                });
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            }
+
+            const color1Rgb = color1.match(/\d+/g).map(Number);
+            const color2Rgb = color2.match(/\d+/g).map(Number);
+
+            const luminance1 = luminance(color1Rgb);
+            const luminance2 = luminance(color2Rgb);
+
+            const contrast = luminance1 > luminance2
+                ? (luminance1 + 0.05) / (luminance2 + 0.05)
+                : (luminance2 + 0.05) / (luminance1 + 0.05);
+
+            return contrast;
+        }
+
+        function checkAccessibility() {
+            const code = document.getElementById('codeInput').value;
+            const doc = new DOMParser().parseFromString(code, 'text/html');
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+
+            accessibilityRules.forEach(rule => {
+                const elements = doc.querySelectorAll(rule.selector);
+                elements.forEach(el => {
+                    if (rule.test(el)) {
+                        const codeSnippet = el.outerHTML.split('>')[0] + '>';
+                        const issue = document.createElement('div');
+                        issue.className = `issue ${rule.severity}`;
+                        issue.innerHTML = `
+                            <div class="category ${rule.category}">${rule.category.toUpperCase()}</div>
+                            <h3>${rule.guideline} - ${rule.suggestion}</h3>
+                            <div><strong>Severity:</strong> ${rule.severity}</div>
+                            <div><strong>Found in:</strong> <code>${codeSnippet}</code></div>
+                            <div class="toggle-details" onclick="toggleDetails(this)">▼ Show fix</div>
+                            <div class="details">
+                                <strong>How to fix:</strong>
+                                <pre>${rule.fix || 'No specific fix provided'}</pre>
+                                ${rule.resources ? `<strong>Resources:</strong>
+                                <ul>${rule.resources.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join('')}</ul>` : ''}
+                            </div>
+                        `;
+                        resultsContainer.appendChild(issue);
+                    }
+                });
+            });
+
+            if (!resultsContainer.children.length) {
+                resultsContainer.innerHTML = `<div class="issue success">
+                    No accessibility issues found! 🎉<br>
+                    Remember to also check:
+                    <ul>
+                        <li>Keyboard navigation (Tab, Enter, etc.)</li>
+                        <li>Screen reader compatibility</li>
+                        <li>Mobile responsiveness and touch interactions</li>
+                    </ul>
+                    Keep up the great work in ensuring web accessibility for all users!
+                </div>`;
+            }
+        }
+
+        function toggleDetails(button) {
+            const details = button.nextElementSibling;
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+            button.textContent = details.style.display === 'none' ? '▼ Show fix' : '▲ Hide fix';
+        }
+    </script>
+</body>
+
+</html>
