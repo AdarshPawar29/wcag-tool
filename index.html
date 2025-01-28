@@ -448,6 +448,237 @@ Good: <table><tr><th>Header</th></tr><tr><td>Data</td></tr></table>`,
                 fix: `Bad: <html>
 Good: <html lang="en">`,
                 resources: ['https://www.w3.org/WAI/WCAG21/Understanding/language-of-page.html']
+            },
+            {
+                category: 'aria-hidden',
+                selector: '[aria-hidden="true"]',
+                test: (el) => el.querySelectorAll('a, button, input, textarea, select').length > 0,
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'Elements with aria-hidden="true" should not contain focusable elements',
+                fix: `Bad: <div aria-hidden="true"><button>Click me</button></div>
+Good: <div aria-hidden="true">Non-focusable content</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'fieldset',
+                selector: 'fieldset',
+                test: (el) => !el.querySelector('legend'),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'error',
+                suggestion: 'Fieldsets must contain a legend element',
+                fix: `Bad: <fieldset><input type="text"></fieldset>
+Good: <fieldset><legend>Label</legend><input type="text"></fieldset>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html']
+            },
+            {
+                category: 'aria-live',
+                selector: '[aria-live]',
+                test: (el) => !['polite', 'assertive'].includes(el.getAttribute('aria-live')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-live attribute must have a valid value (polite or assertive)',
+                fix: `Bad: <div aria-live="invalid">...</div>
+Good: <div aria-live="polite">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'form',
+                selector: 'form',
+                test: (el) => !el.querySelector('input, select, textarea, button'),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'error',
+                suggestion: 'Forms must contain at least one input, select, textarea, or button element',
+                fix: `Bad: <form></form>
+Good: <form><input type="text"></form>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html']
+            },
+            {
+                category: 'label',
+                selector: 'label',
+                test: (el) => !el.getAttribute('for') || !document.getElementById(el.getAttribute('for')),
+                guideline: '1.3.1 Info and Relationships',
+                severity: 'error',
+                suggestion: 'Labels must be associated with a valid form control',
+                fix: `Bad: <label for="name">Name</label>
+Good: <label for="name">Name</label><input type="text" id="name">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html']
+            },
+            {
+                category: 'title',
+                selector: 'title',
+                test: (el) => !el.textContent.trim(),
+                guideline: '2.4.2 Page Titled',
+                severity: 'error',
+                suggestion: 'The <title> element must not be empty',
+                fix: `Bad: <title></title>
+Good: <title>Page Title</title>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/page-titled.html']
+            },
+            {
+                category: 'aria-expanded',
+                selector: '[aria-expanded]',
+                test: (el) => !['true', 'false'].includes(el.getAttribute('aria-expanded')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-expanded attribute must have a valid value (true or false)',
+                fix: `Bad: <div aria-expanded="invalid">...</div>
+Good: <div aria-expanded="true">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-pressed',
+                selector: '[aria-pressed]',
+                test: (el) => !['true', 'false', 'mixed'].includes(el.getAttribute('aria-pressed')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-pressed attribute must have a valid value (true, false, or mixed)',
+                fix: `Bad: <button aria-pressed="invalid">...</button>
+Good: <button aria-pressed="true">...</button>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-required',
+                selector: '[aria-required]',
+                test: (el) => !['true', 'false'].includes(el.getAttribute('aria-required')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-required attribute must have a valid value (true or false)',
+                fix: `Bad: <input aria-required="invalid">
+Good: <input aria-required="true">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-invalid',
+                selector: '[aria-invalid]',
+                test: (el) => !['true', 'false', 'grammar', 'spelling'].includes(el.getAttribute('aria-invalid')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-invalid attribute must have a valid value (true, false, grammar, or spelling)',
+                fix: `Bad: <input aria-invalid="invalid">
+Good: <input aria-invalid="true">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-describedby',
+                selector: '[aria-describedby]',
+                test: (el) => !document.getElementById(el.getAttribute('aria-describedby')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-describedby attribute must reference a valid element ID',
+                fix: `Bad: <input aria-describedby="invalid">
+Good: <input aria-describedby="description"><div id="description">Description text</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-controls',
+                selector: '[aria-controls]',
+                test: (el) => !document.getElementById(el.getAttribute('aria-controls')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-controls attribute must reference a valid element ID',
+                fix: `Bad: <button aria-controls="invalid">...</button>
+Good: <button aria-controls="content">...</button><div id="content">Content</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-labelledby',
+                selector: '[aria-labelledby]',
+                test: (el) => !document.getElementById(el.getAttribute('aria-labelledby')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-labelledby attribute must reference a valid element ID',
+                fix: `Bad: <div aria-labelledby="invalid">...</div>
+Good: <div aria-labelledby="label"><span id="label">Label text</span></div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-busy',
+                selector: '[aria-busy]',
+                test: (el) => !['true', 'false'].includes(el.getAttribute('aria-busy')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-busy attribute must have a valid value (true or false)',
+                fix: `Bad: <div aria-busy="invalid">...</div>
+Good: <div aria-busy="true">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-haspopup',
+                selector: '[aria-haspopup]',
+                test: (el) => !['false', 'true', 'menu', 'listbox', 'tree', 'grid', 'dialog'].includes(el.getAttribute('aria-haspopup')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-haspopup attribute must have a valid value (false, true, menu, listbox, tree, grid, or dialog)',
+                fix: `Bad: <button aria-haspopup="invalid">...</button>
+Good: <button aria-haspopup="menu">...</button>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-autocomplete',
+                selector: '[aria-autocomplete]',
+                test: (el) => !['inline', 'list', 'both', 'none'].includes(el.getAttribute('aria-autocomplete')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-autocomplete attribute must have a valid value (inline, list, both, or none)',
+                fix: `Bad: <input aria-autocomplete="invalid">
+Good: <input aria-autocomplete="list">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-readonly',
+                selector: '[aria-readonly]',
+                test: (el) => !['true', 'false'].includes(el.getAttribute('aria-readonly')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-readonly attribute must have a valid value (true or false)',
+                fix: `Bad: <input aria-readonly="invalid">
+Good: <input aria-readonly="true">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-selected',
+                selector: '[aria-selected]',
+                test: (el) => !['true', 'false'].includes(el.getAttribute('aria-selected')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-selected attribute must have a valid value (true or false)',
+                fix: `Bad: <div aria-selected="invalid">...</div>
+Good: <div aria-selected="true">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-checked',
+                selector: '[aria-checked]',
+                test: (el) => !['true', 'false', 'mixed'].includes(el.getAttribute('aria-checked')),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-checked attribute must have a valid value (true, false, or mixed)',
+                fix: `Bad: <input type="checkbox" aria-checked="invalid">
+Good: <input type="checkbox" aria-checked="true">`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-valuemin',
+                selector: '[aria-valuemin]',
+                test: (el) => isNaN(parseFloat(el.getAttribute('aria-valuemin'))),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-valuemin attribute must have a valid numeric value',
+                fix: `Bad: <div aria-valuemin="invalid">...</div>
+Good: <div aria-valuemin="0">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
+            },
+            {
+                category: 'aria-valuemax',
+                selector: '[aria-valuemax]',
+                test: (el) => isNaN(parseFloat(el.getAttribute('aria-valuemax'))),
+                guideline: '4.1.2 Name, Role, Value',
+                severity: 'error',
+                suggestion: 'aria-valuemax attribute must have a valid numeric value',
+                fix: `Bad: <div aria-valuemax="invalid">...</div>
+Good: <div aria-valuemax="100">...</div>`,
+                resources: ['https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html']
             }
         ];
 
